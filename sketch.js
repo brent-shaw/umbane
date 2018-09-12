@@ -89,8 +89,8 @@ class block {
       var b = brightness(this.color);
       strokeWeight(2);
       stroke(color(h, s - 50, b));
-      current = this;
       if (this.locked == true) {
+        current = this;
         fill(color(h, s - 50, b));
       }
       this.over = true;
