@@ -1,5 +1,7 @@
 var blocks = [];
-var locked = false;
+var connections = []
+var blocklocked = false;
+var socketlocked = false;
 var current
 var xOffset = 0.0;
 var yOffset = 0.0;
@@ -8,29 +10,54 @@ function setup() {
   createCanvas(900, 800);
   colorMode(HSB, 255);
   colour = [color(255, 0, 255), color(90, 150, 255), color(0, 150, 255), color(160, 150, 255)];
-  blocks.push(new source(30, 20));
-  blocks.push(new processor(330, 20));
-  blocks.push(new sink(630, 20));
+  var rows = 1
+	for (i = 1; i <= 1; i++) {
+	blocks.push(new source(30, (i*5)*20));
+  blocks.push(new processor(330, (i*5)*20));
+  blocks.push(new sink(630, (i*5)*20));
+	}
+  
+  //Programmatically added connections.
+  //TODO: Add click to connect system
+	connections.push(new connector(blocks[0].sockets[0], blocks[1].sockets[1]));
+	connections.push(new connector(blocks[1].sockets[0], blocks[2].sockets[0]));
+	
 }
 
 function draw() {
   background(80);
+  
+  //Manually shown. This should sclae automatically.
+  connections[0].show();
+	connections[1].show();
 
   for (i = 0; i < blocks.length; i++) {
     blocks[i].show();
   }
+	
 }
 
 function mousePressed() {
-  if (!locked) {
+  if (!blocklocked) {
     for (i = 0; i < blocks.length; i++) {
       if (blocks[i].over) {
         blocks[i].lock();
         current = blocks[i]
-        locked = true;
+        blocklocked = true;
         break;
       }
-      // }
+    }
+  }
+	if (!socketlocked) {
+    for (i = 0; i < blocks.length; i++) {
+			for (j = 0; j < blocks[i].sockets.length; j++) {
+				if (blocks[i].sockets[j].over) {
+					blocks[i].sockets[j].lock();
+					current = blocks[i].sockets[j]
+					socketlocked = true;
+					break;
+				}
+			}
     }
   }
   xOffset = mouseX - current.x;
@@ -38,17 +65,26 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-  if (locked) {
+  if (blocklocked) {
     current.move(mouseX - xOffset, mouseY - yOffset);
   }
 }
 
 function mouseReleased() {
-  if (locked) {
+  if (blocklocked) {
     for (i = 0; i < blocks.length; i++) {
       blocks[i].unlock();
     }
-    locked = false;
+    blocklocked = false;
+    current = null;
+  }
+	if (socketlocked) {
+    for (i = 0; i < blocks.length; i++) {
+			for (j = 0; j < blocks[i].sockets.length; j++) {
+					blocks[i].sockets[j].unlock();
+				}
+		}
+    socketlocked = false;
     current = null;
   }
 }
@@ -67,10 +103,12 @@ class block {
 
   lock() {
     this.locked = true;
+		console.log('Block locked')
   }
 
   unlock() {
     this.locked = false;
+		console.log('Block unlocked')
   }
 
   move(x, y) {
@@ -152,6 +190,8 @@ class socket {
     this.w = _w;
     this.h = _h;
     this.t = _t;
+		this.over = false;
+		this.locked = false;
   }
 
   move(x, y) {
@@ -159,6 +199,16 @@ class socket {
     this.y = y;
   }
 
+  lock() {
+    this.locked = true;
+		console.log('Socket locked')
+  }
+
+  unlock() {
+    this.locked = false;
+		console.log('Socket unlocked')
+  }
+	
   show() {
     fill(colour[0]);
     stroke(180);
@@ -166,18 +216,46 @@ class socket {
       case 0:
         ellipse(this.x + this.w, this.y + (this.h / 2), 20, 20);
         if (mouseX > this.x + this.w - 10 && mouseX < this.x + this.w + 10 && mouseY > this.y + (this.h / 2) - 10 && mouseY < this.y + (this.h / 2) + 10) {
-          fill(color(255, 0, 100));
+          this.over = true;
+					fill(color(255, 0, 100));
           ellipse(this.x + this.w, this.y + (this.h / 2), 12, 12);
         }
+				else
+				{
+					this.over = false;
+				}
         break;
       case 1:
         ellipse(this.x, this.y + (this.h / 2), 20, 20);
         if (mouseX > this.x - 10 && mouseX < this.x + 10 && mouseY > this.y + (this.h / 2) - 10 && mouseY < this.y + (this.h / 2) + 10) {
-          fill(color(255, 0, 100));
+          this.over = true;
+					fill(color(255, 0, 100));
           ellipse(this.x, this.y + (this.h / 2), 12, 12);
         }
+				else
+				{
+					this.over = false;
+				}
         break;
     }
     noStroke();
   }
+}
+
+class connector {
+	constructor(_i, _o){
+		this.input = _i;
+		this.output = _o;
+	}
+	
+	show() {
+		var p1x = this.input.x + this.input.w;
+		var p1y = this.input.y + (this.input.h / 2);
+		var p2x = this.output.x;
+		var p2y = this.output.y + (this.output.h / 2);
+		noFill();
+		stroke(colour[0]);
+	 	strokeWeight(1);
+		bezier(p1x, p1y, p2x-(20), p1y, p1x+(20), p2y, p2x, p2y);
+	}
 }
