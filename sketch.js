@@ -1,10 +1,12 @@
+//Comments are coming. I promise :)
 var blocks = [];
 var connections = []
 var blocklocked = false;
 var socketlocked = false;
-var current
+var current;
 var xOffset = 0.0;
 var yOffset = 0.0;
+var connect;
 
 function setup() {
   createCanvas(900, 800);
@@ -16,25 +18,23 @@ function setup() {
   blocks.push(new processor(330, (i*5)*20));
   blocks.push(new sink(630, (i*5)*20));
 	}
-  
-  //Programmatically added connections.
-  //TODO: Add click to connect system
-	connections.push(new connector(blocks[0].sockets[0], blocks[1].sockets[1]));
-	connections.push(new connector(blocks[1].sockets[0], blocks[2].sockets[0]));
-	
 }
 
 function draw() {
-  background(80);
-  
-  //Manually shown. This should sclae automatically.
-  connections[0].show();
-	connections[1].show();
-
-  for (i = 0; i < blocks.length; i++) {
-    blocks[i].show();
+  if (!socketlocked){
+    render()
   }
-	
+}
+
+function render() {
+    background(80);
+  	for (i = 0; i < connections.length; i++) {
+    	connections[i].show();
+    }
+
+    for (i = 0; i < blocks.length; i++) {
+      blocks[i].show();
+    }
 }
 
 function mousePressed() {
@@ -68,6 +68,13 @@ function mouseDragged() {
   if (blocklocked) {
     current.move(mouseX - xOffset, mouseY - yOffset);
   }
+  if (socketlocked) {
+    render();
+    noFill();
+    stroke(colour[0]);
+	 	strokeWeight(1);
+		bezier(current.x + current.w, current.y + (current.h / 2), mouseX-(20), current.y + (current.h / 2), current.x + current.w +(20), mouseY, mouseX, mouseY);
+  }
 }
 
 function mouseReleased() {
@@ -81,6 +88,9 @@ function mouseReleased() {
 	if (socketlocked) {
     for (i = 0; i < blocks.length; i++) {
 			for (j = 0; j < blocks[i].sockets.length; j++) {
+        	if(blocks[i].sockets[j].over){
+            connections.push(new connector(current, blocks[i].sockets[j]));
+          }
 					blocks[i].sockets[j].unlock();
 				}
 		}
