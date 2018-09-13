@@ -82,7 +82,6 @@ function mouseReleased() {
     for (i = 0; i < blocks.length; i++) {
       blocks[i].unlock();
     }
-    blocklocked = false;
     current = null;
   }
 	if (socketlocked) {
@@ -94,9 +93,10 @@ function mouseReleased() {
 					blocks[i].sockets[j].unlock();
 				}
 		}
-    socketlocked = false;
     current = null;
   }
+  blocklocked = false;
+  socketlocked = false;
 }
 
 class block {
@@ -131,7 +131,7 @@ class block {
 
   show() {
     fill(this.color);
-    if (mouseX > this.x && mouseX < this.x + this.rwidth && mouseY > this.y && mouseY < this.y + this.rheight) {
+    if (mouseX > this.x + 10 && mouseX < this.x + this.rwidth - 10 && mouseY > this.y && mouseY < this.y + this.rheight) {
       var h = hue(this.color);
       var s = saturation(this.color);
       var b = brightness(this.color);
