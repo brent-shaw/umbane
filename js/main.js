@@ -32,7 +32,7 @@ function draw() {
 }
 
 function render() {
-    background(80);
+    background(color(227, 31, 12));
   	// for (i = 0; i < connections.length; i++) {
    //  	connections[i].show();
    //  }

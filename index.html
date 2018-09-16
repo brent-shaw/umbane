@@ -8,6 +8,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#212121" />
 
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script> 
+
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
 
@@ -15,6 +20,65 @@
     <body>
         <script src="node_modules/p5/lib/addons/p5.sound.min.js"></script>
         <script src="node_modules/p5/lib/p5.min.js"></script>
-        <script src="js/main.js"></script>
+        <script src="node_modules/p5/lib/addons/p5.dom.min.js"></script>
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                <a class="nav-link" href="#">UMBANE</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        File
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">New Flow</a>
+                        <a class="dropdown-item" href="#">New Window</a>
+                        <hr/>
+                        <a class="dropdown-item" href="#">Open</a>
+                        <hr/>
+                        <a class="dropdown-item" href="#">Save</a>
+                        <a class="dropdown-item" href="#">Save As</a>
+                        <hr/>
+                        <a class="dropdown-item" href="#">Import</a>
+                        <a class="dropdown-item" href="#">Export</a>
+                        <hr/>
+                        <a class="dropdown-item" href="#">Close</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Edit
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Cut</a>
+                        <a class="dropdown-item" href="#">Copy</a>
+                        <a class="dropdown-item" href="#">Paste</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Selection
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Select All</a>
+                        <a class="dropdown-item" href="#">Select None</a>
+                        <a class="dropdown-item" href="#">Invert Selection</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Blocks
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Source</a>
+                        <a class="dropdown-item" href="#">Processor</a>
+                        <a class="dropdown-item" href="#">Sink</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <div class="container">
+            <script src="js/main.js"></script>
+        </div>
     </body>
 </html>

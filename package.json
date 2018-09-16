@@ -1,7 +1,7 @@
 {
   "name": "umbane",
   "version": "0.0.1",
-  "description": "A flow programming style interface for web browser",
+  "description": "A flow programming style interface for web browsers",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tonetechnician/umbane.git"
+    "url": "git+https://github.com/brent-shaw/umbane.git"
   },
   "keywords": [
     "js"
   ],
   "author": "Brent Shaw",
-  "license": "ISC",
+  "license": "CC-BY-SA-4.0",
   "bugs": {
-    "url": "https://github.com/tonetechnician/umbane/issues"
+    "url": "https://github.com/brent-shaw/umbane/issues"
   },
-  "homepage": "https://github.com/tonetechnician/umbane#readme",
+  "homepage": "https://github.com/brent-shaw/umbane#readme",
   "dependencies": {
     "opn": "^5.3.0",
     "p5": "^0.7.2"
