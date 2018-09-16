@@ -1,10 +1,12 @@
 # umbane - A Flow Programming style interface
 
-![alt text](https://github.com/brent-shaw/umbane/blob/master/connected.gif "Logo Title Text 1")
+![alt text](https://github.com/brent-shaw/umbane/blob/master/umbane.svg
 
 This is still under development. Help would be nice :D
 
 Written in P5.js
+
+![alt text](https://github.com/brent-shaw/umbane/blob/master/connected.gif "Block can be created and linked together")
 
 # install 
 
