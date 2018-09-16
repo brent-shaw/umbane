@@ -1,4 +1,9 @@
-//Comments are coming. I promise :)
+// Web browser kak
+document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+    }, false);
+
+// P5
 var blocks = [];
 var connections = []
 var blocklocked = false;
@@ -9,14 +14,14 @@ var yOffset = 0.0;
 var connect;
 
 function setup() {
-  createCanvas(900, 800);
+  createCanvas(windowWidth, windowHeight);
   colorMode(HSB, 255);
   colour = [color(255, 0, 255), color(90, 150, 255), color(0, 150, 255), color(160, 150, 255)];
   var rows = 1
 	for (i = 1; i <= 1; i++) {
 	blocks.push(new source(30, (i*5)*20));
   blocks.push(new processor(330, (i*5)*20));
-  blocks.push(new sink(630, (i*5)*20));
+  blocks.push(new sink(630, (i*5)*20) );
 	}
 }
 
@@ -28,40 +33,82 @@ function draw() {
 
 function render() {
     background(80);
-  	for (i = 0; i < connections.length; i++) {
-    	connections[i].show();
-    }
+  	// for (i = 0; i < connections.length; i++) {
+   //  	connections[i].show();
+   //  }
 
     for (i = 0; i < blocks.length; i++) {
       blocks[i].show();
     }
 }
 
+// Mouse stuff
 function mousePressed() {
-  if (!blocklocked) {
-    for (i = 0; i < blocks.length; i++) {
-      if (blocks[i].over) {
-        blocks[i].lock();
-        current = blocks[i]
-        blocklocked = true;
-        break;
-      }
-    }
-  }
-	if (!socketlocked) {
-    for (i = 0; i < blocks.length; i++) {
-			for (j = 0; j < blocks[i].sockets.length; j++) {
-				if (blocks[i].sockets[j].over) {
-					blocks[i].sockets[j].lock();
-					current = blocks[i].sockets[j]
-					socketlocked = true;
-					break;
-				}
-			}
-    }
-  }
-  xOffset = mouseX - current.x;
-  yOffset = mouseY - current.y;
+  try{	// stop error
+	  switch (mouseButton){
+	  	case LEFT:
+	  	  // if(current !== undefined){	//stop throwing error
+		  	  if (!blocklocked) {
+			    for (i = 0; i < blocks.length; i++) {
+			      if (blocks[i].over) {
+			        blocks[i].lock();
+			        current = blocks[i]
+			        blocklocked = true;
+			        break;
+			      }
+			    }
+			  }
+				if (!socketlocked) {
+			    for (i = 0; i < blocks.length; i++) {
+						for (j = 0; j < blocks[i].sockets.length; j++) {
+							if (blocks[i].sockets[j].over) {
+								blocks[i].sockets[j].lock();
+								current = blocks[i].sockets[j]
+								socketlocked = true;
+								break;
+							}
+						}
+			    }
+			  }
+			  xOffset = mouseX - current.x;
+			  yOffset = mouseY - current.y;
+			// }
+		  break;
+		  case RIGHT:
+	    	  // if(current !== undefined){	//stop throwing error
+				  if (!blocklocked) {
+				    for (i = 0; i < blocks.length; i++) {
+				      if (blocks[i].over) {
+				      	// Remove connector then block
+				      	// find connection correct connection to block
+
+				      	blocks.splice(i, 1 );
+                // blocks[i].remove()
+
+				        break;
+				      }
+				    }
+				  }
+					if (!socketlocked) {
+				    for (i = 0; i < blocks.length; i++) {
+							for (j = 0; j < blocks[i].sockets.length; j++) {
+								if (blocks[i].sockets[j].over) {
+									blocks[i].sockets[j].lock();
+									current = blocks[i].sockets[j]
+									socketlocked = true;
+									break;
+								}
+							}
+				    }
+				  }
+				  xOffset = mouseX - current.x;
+				  yOffset = mouseY - current.y;
+				// }
+			  break;
+	  }
+	} catch (e){
+
+	}
 }
 
 function mouseDragged() {
@@ -78,25 +125,51 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
+  if (socketlocked) {
+    for (i = 0; i < blocks.length; i++) {
+			for (j = 0; j < blocks[i].sockets.length; j++) {
+        	if(blocks[i].sockets[j].over){
+            var connection = new connector(current, blocks[i].sockets[j]);
+	    		  // connections.push(connection);
+            // current.recordConnection(connections.length)
+            // blocks[i].sockets[j].recordConnection(connections.length)
+            // current.recordConnection(connection)
+            blocks[i].sockets[j].recordConnection(connection)
+         	}
+				blocks[i].sockets[j].unlock();
+		}
+	}
+    current = null;
+  }
   if (blocklocked) {
     for (i = 0; i < blocks.length; i++) {
       blocks[i].unlock();
     }
     current = null;
   }
-	if (socketlocked) {
-    for (i = 0; i < blocks.length; i++) {
-			for (j = 0; j < blocks[i].sockets.length; j++) {
-        	if(blocks[i].sockets[j].over){
-            connections.push(new connector(current, blocks[i].sockets[j]));
-          }
-					blocks[i].sockets[j].unlock();
-				}
-		}
-    current = null;
-  }
+
+  // console.log(connections)
   blocklocked = false;
   socketlocked = false;
+}
+
+// Keyboard stuff
+function keyPressed(){
+	switch (key){
+		case '1':
+		// Make source
+			blocks.push(new source(mouseX, mouseY));
+			console.log('here')
+		break;
+		case '2':
+		// Make processor
+			blocks.push(new processor(mouseX, mouseY));
+		break;
+		case '3':
+		// make sink
+			blocks.push(new sink(mouseX, mouseY)); 
+		break;
+	}
 }
 
 class block {
@@ -108,7 +181,7 @@ class block {
     this.over = false;
     this.color
     this.locked = false;
-    this.sockets = []
+    this.sockets = [];
   }
 
   lock() {
@@ -200,8 +273,16 @@ class socket {
     this.w = _w;
     this.h = _h;
     this.t = _t;
-		this.over = false;
-		this.locked = false;
+	  this.over = false;
+	  this.locked = false;
+    // record connections
+    this.connections = [];
+  }
+
+  recordConnection(connector){
+    // Draw connection
+    // console.log(idx_connector)
+    this.connections.push(connector)
   }
 
   move(x, y) {
@@ -218,7 +299,7 @@ class socket {
     this.locked = false;
 		console.log('Socket unlocked')
   }
-	
+
   show() {
     fill(colour[0]);
     stroke(180);
@@ -247,15 +328,21 @@ class socket {
 					this.over = false;
 				}
         break;
+        
     }
     noStroke();
+    // Show connections to this socket
+    this.connections.map(c => c.show());
   }
 }
 
 class connector {
-	constructor(_i, _o){
+	constructor(_i, _o,inBlock,outBlock){
 		this.input = _i;
 		this.output = _o;
+		this.inputTo = inBlock;
+		this.outputTo = outBlock;
+		this.over = false;
 	}
 	
 	show() {
@@ -267,5 +354,9 @@ class connector {
 		stroke(colour[0]);
 	 	strokeWeight(1);
 		bezier(p1x, p1y, p2x-(20), p1y, p1x+(20), p2y, p2x, p2y);
+	}
+
+	over(){
+
 	}
 }
