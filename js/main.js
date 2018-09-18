@@ -1,9 +1,16 @@
+/**
+ * @fileoverview This file contains the Umbane Javascript components and classes.
+ * @package
+ */
+
 // Web browser kak
 document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
     }, false);
 
-// P5
+words = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "Xray", "Yankee", "Zulu"];
+
+// Global
 var blocks = [];
 var connections = []
 var blocklocked = false;
@@ -12,17 +19,12 @@ var current;
 var xOffset = 0.0;
 var yOffset = 0.0;
 var connect;
+var count = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   colorMode(HSB, 255);
   colour = [color(255, 0, 255), color(90, 150, 255), color(0, 150, 255), color(160, 150, 255)];
-  var rows = 1
-	for (i = 1; i <= 1; i++) {
-	blocks.push(new source(30, (i*5)*20));
-  blocks.push(new processor(330, (i*5)*20));
-  blocks.push(new sink(630, (i*5)*20) );
-	}
 }
 
 function draw() {
@@ -33,10 +35,6 @@ function draw() {
 
 function render() {
     background(color(227, 31, 12));
-  	// for (i = 0; i < connections.length; i++) {
-   //  	connections[i].show();
-   //  }
-
     for (i = 0; i < blocks.length; i++) {
       blocks[i].show();
     }
@@ -47,7 +45,6 @@ function mousePressed() {
   try{	// stop error
 	  switch (mouseButton){
 	  	case LEFT:
-	  	  // if(current !== undefined){	//stop throwing error
 		  	  if (!blocklocked) {
 			    for (i = 0; i < blocks.length; i++) {
 			      if (blocks[i].over) {
@@ -72,19 +69,14 @@ function mousePressed() {
 			  }
 			  xOffset = mouseX - current.x;
 			  yOffset = mouseY - current.y;
-			// }
 		  break;
 		  case RIGHT:
-	    	  // if(current !== undefined){	//stop throwing error
 				  if (!blocklocked) {
 				    for (i = 0; i < blocks.length; i++) {
 				      if (blocks[i].over) {
-				      	// Remove connector then block
-				      	// find connection correct connection to block
-
-				      	blocks.splice(i, 1 );
-                // blocks[i].remove()
-
+                //blocks[i].remove();
+                blocks.splice(i, 1);
+                //delete blocks[i];
 				        break;
 				      }
 				    }
@@ -103,7 +95,6 @@ function mousePressed() {
 				  }
 				  xOffset = mouseX - current.x;
 				  yOffset = mouseY - current.y;
-				// }
 			  break;
 	  }
 	} catch (e){
@@ -133,7 +124,7 @@ function mouseReleased() {
 	    		  // connections.push(connection);
             // current.recordConnection(connections.length)
             // blocks[i].sockets[j].recordConnection(connections.length)
-            // current.recordConnection(connection)
+            current.recordConnection(connection)
             blocks[i].sockets[j].recordConnection(connection)
          	}
 				blocks[i].sockets[j].unlock();
@@ -159,7 +150,6 @@ function keyPressed(){
 		case '1':
 		// Make source
 			blocks.push(new source(mouseX, mouseY));
-			console.log('here')
 		break;
 		case '2':
 		// Make processor
@@ -167,11 +157,40 @@ function keyPressed(){
 		break;
 		case '3':
 		// make sink
-			blocks.push(new sink(mouseX, mouseY)); 
-		break;
-	}
+			blocks.push(new sink(mouseX, mouseY));
+    break;
+
+    // DEBUG STUFF
+    // List connection for block
+    case 'l':
+      for (i = 0; i < blocks.length; i++) {
+        if (blocks[i].over) {
+          console.log(blocks[i].label + ' block');
+          var blockCons = blocks[i].getConnections()
+          for (j = 0; j < blockCons.length; j++) {
+            console.log(blockCons[j][0]+ ' -> ' +blockCons[j][1])
+          }
+        }
+      }
+    break;
+    case 'c':
+    for (i = 0; i < connections.length; i++) {
+      if (blocks[i].over) {
+        console.log(blocks[i].label);
+        console.log("|")
+        for (j = 0; j < blocks[i].sockets.length; j++) {
+          //console.log(blocks[i].sockets[j].connections)
+          for (k = 0; k < blocks[i].sockets[j].connections.length; k++) {
+            console.log(blocks[i].sockets[j].connections[k].input.block.label+'->'+blocks[i].sockets[j].connections[k].output.block.label);
+          }
+        }
+      }
+    }
+  break;
+  }
 }
 
+// Object classes
 class block {
   constructor(_x, _y) {
     this.x = _x;
@@ -182,16 +201,35 @@ class block {
     this.color
     this.locked = false;
     this.sockets = [];
+    this.label = words[count];
+    count ++;
+  }
+
+  remove(){
+    for (i = 0; i < this.sockets.length; i++) {
+      for (k = 0; k < blocks[i].sockets[j].connections.length; k++) {
+        delete blocks[i].sockets[j].connections[k];
+        //console.log(blocks[i].sockets[j].connections[k].input.block.label+'->'+blocks[i].sockets[j].connections[k].output.block.label)
+      }
+    }
+  }
+
+  getConnections(){
+    var c = [];
+    for (j = 0; j < this.sockets.length; j++) {
+      for (var l = 0; l < this.sockets[j].connections.length; l++) {
+        c.push([this.sockets[j].connections[l].input.block.label, this.sockets[j].connections[l].output.block.label]);
+      }
+    }
+    return c;
   }
 
   lock() {
     this.locked = true;
-		console.log('Block locked')
   }
 
   unlock() {
     this.locked = false;
-		console.log('Block unlocked')
   }
 
   move(x, y) {
@@ -221,6 +259,10 @@ class block {
       noStroke();
     }
     rect(this.x, this.y, this.rwidth, this.rheight, 5);
+    textSize(18);
+    textAlign(CENTER);
+    fill(color(0, 0, 60));
+    text(this.label, this.x + (this.rwidth/2), this.y+ (this.rheight/2) +5);
     strokeWeight(1);
   }
 }
@@ -229,9 +271,9 @@ class source extends block {
   constructor(_x, _y) {
     super(_x, _y);
     this.color = colour[1];
-    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 0));
+    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 0, this));
   }
-  
+
   show() {
     super.show();
     this.sockets[0].show();
@@ -242,10 +284,10 @@ class processor extends block {
   constructor(_x, _y) {
     super(_x, _y);
     this.color = colour[2];
-    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 1));
-    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 0));
+    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 1, this));
+    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 0, this));
   }
-  
+
   show() {
     super.show();
     this.sockets[0].show();
@@ -257,9 +299,9 @@ class sink extends block {
   constructor(_x, _y) {
     super(_x, _y);
     this.color = colour[3];
-    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 1));
+    this.sockets.push(new socket(this.x, this.y, this.rwidth, this.rheight, 1, this));
   }
-  
+
   show() {
     super.show();
     this.sockets[0].show();
@@ -267,7 +309,7 @@ class sink extends block {
 }
 
 class socket {
-  constructor(_x, _y, _w, _h, _t) {
+  constructor(_x, _y, _w, _h, _t, _b) {
     this.x = _x;
     this.y = _y;
     this.w = _w;
@@ -277,6 +319,7 @@ class socket {
 	  this.locked = false;
     // record connections
     this.connections = [];
+    this.block = _b;
   }
 
   recordConnection(connector){
@@ -292,12 +335,10 @@ class socket {
 
   lock() {
     this.locked = true;
-		console.log('Socket locked')
   }
 
   unlock() {
     this.locked = false;
-		console.log('Socket unlocked')
   }
 
   show() {
@@ -328,7 +369,7 @@ class socket {
 					this.over = false;
 				}
         break;
-        
+
     }
     noStroke();
     // Show connections to this socket
@@ -342,9 +383,9 @@ class connector {
 		this.output = _o;
 		this.inputTo = inBlock;
 		this.outputTo = outBlock;
-		this.over = false;
+    this.over = false;
 	}
-	
+
 	show() {
 		var p1x = this.input.x + this.input.w;
 		var p1y = this.input.y + (this.input.h / 2);
